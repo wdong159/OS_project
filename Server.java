@@ -87,16 +87,13 @@ public class Server{
 			//store the new client out put stream so we can boardcast to everyone
 			writers.add(output2client);
 
-			for(DataOutputStream w:  writers){
-				w.writeUTF("GOCHAT!");
-			}
+			output2client.writeUTF("GOCHAT!");
 
 			//conversition start here, once someon type LOGOUT he/she is going to sign out
 			while(true){
 				String message = input4mclient.readUTF();
 				if(message.equals("LOGOUT")){
 					output2client.writeUTF("YOUHAVELOGOUT");
-					System.out.println("you");
 					break;
 				}
 				for(DataOutputStream w : writers){
@@ -104,6 +101,7 @@ public class Server{
 					w.writeUTF("Message" + name +":"+ message);
 				}
 			}//end of while sending message
+			System.out.println("123");
 
 		}catch(Exception e){
 			System.out.println(e);

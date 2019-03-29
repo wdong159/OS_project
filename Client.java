@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 public class Client{
 	static String name;
 	static boolean go = false;
-	static boolean talk = true;
 	public static void main(String[] args) throws Exception{
 		try{
 			//create a socket to make connection to server socket
@@ -48,6 +47,7 @@ public class Client{
 								data2server.writeUTF(msg);
 							}catch(Exception e){
 								System.out.println(e);
+								break;
 							}
 					}
 				}
@@ -64,13 +64,18 @@ public class Client{
 					try{
 						while(true){
 							try{
-								//bunch of if statement for reading the message
+								/*
+								read the output from the server
+								take action base on what server had send
+								for example when you join the server will ask for user name
+								*/
 								String result = result4mserver.readUTF();
 								if(result.startsWith("YOURNAME")){
 										System.out.println(result);
 										name = scn.next();
 										name.toUpperCase();
 										data2server.writeUTF(name);
+										sendMsg.start();
 								}else if(result.startsWith("Message")){
 									Pattern pattern = Pattern.compile(name);
 									Matcher there = pattern.matcher(result);
@@ -78,21 +83,16 @@ public class Client{
 										System.out.println(result.substring(7));
 								}else if(result.startsWith("JOINGROUP")){
 									System.out.println(result.substring(9) + " has join the chat");
-								}else if(result.startsWith("NAME")){
-									System.out.println(result.substring(4));
-								}
-								else if(result.equals("GOCHAT!")){
-									if(talk)
+								}else if(result.equals("GOCHAT!")){
 										System.out.println("You can start talking now!");
-									talk = false;
-									sendMsg.start();						
 								}else if(result.equals("YOUHAVELOGOUT")){
 									System.out.println("YOU had log out from the chat");
 									break;
+								}else{
 								}
 							}catch (Exception e){
-								
 								System.out.println(e);
+								break;
 							}
 						}
 					}catch (Exception e){
