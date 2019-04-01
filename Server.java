@@ -17,7 +17,7 @@ public class Server {
 	 */
 	private static Set<String> allClient = new HashSet<>();
 	private static Set<DataOutputStream> writers = new HashSet<>();
-	public static boolean moreThenTwo = false;
+	// public static boolean moreThenTwo = false;
 
 	public static void main(String[] args) {
 		ServerSocket servSock;
@@ -35,15 +35,14 @@ public class Server {
 				Thread clinet = new Thread(room);
 				clinet.start();
 			}
+
 		} catch (IOException ioe) {
 			System.err.println(ioe);
 		}
 
 	}// End-of-main
 
-	/*
-	 * thread class
-	 */
+	// Thread class
 	private static class ChatRoom implements Runnable {
 
 		Socket socket;
@@ -63,15 +62,14 @@ public class Server {
 				output2client = new DataOutputStream(socket.getOutputStream());
 
 				/*
-				 * Ask for the user name and if user name already exists ask for another user
-				 * name
+				 * Ask for the username and if username already exists ask for another username
 				 */
 				while (true) {
 					output2client.writeUTF("YOURNAME");
 					name = input4mclient.readUTF();
 					if (name == null)
 						return;
-					// synchronized- let add new client to the group
+					// synchronized - adds a new client to the group
 					synchronized (allClient) {
 						if (name != null && !allClient.contains(name)) {
 							allClient.add(name);
@@ -100,10 +98,10 @@ public class Server {
 					}
 					for (DataOutputStream w : writers) {
 
-						w.writeUTF("Message" + name + ": " + message + "\n");
+						w.writeUTF("Message" + name + ": " + message);
 					}
 				} // end of while sending message
-				System.out.println("123");
+					// System.out.println("123");
 
 			} catch (Exception e) {
 				System.out.println(e);

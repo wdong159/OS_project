@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 public class Client {
 	static String name;
-	static boolean go = false;
+	// static boolean go = false;
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -28,9 +28,7 @@ public class Client {
 			// create an input stream to receive data from the server
 			DataInputStream result4mserver = new DataInputStream(sock.getInputStream());
 
-			/*
-			 * thread for sending out messages to the server
-			 */
+			// Thread for sending messages to the server
 			Thread sendMsg = new Thread(new Runnable() {
 
 				@Override
@@ -51,9 +49,7 @@ public class Client {
 				}
 			});
 
-			/*
-			 * thread for reading messages from the client
-			 */
+			// Used for reading messages from the client
 			Thread readMsg = new Thread(new Runnable() {
 
 				@Override
@@ -62,10 +58,12 @@ public class Client {
 						while (true) {
 							try {
 								/*
-								 * read the output from the server and take action based on what server had asked for
-								 * Ex: when you join, the server will ask for username
+								 * read the output from the server and take action based on what server had
+								 * asked for Ex: when you join, the server will ask for username
 								 */
 								String result = result4mserver.readUTF();
+
+								// If user joins the chat, asks for a username
 								if (result.startsWith("YOURNAME")) {
 									System.out.println(result);
 									name = scn.next();
@@ -73,16 +71,25 @@ public class Client {
 									data2server.writeUTF(name);
 									sendMsg.start();
 								} else if (result.startsWith("Message")) {
+
+									// Regex pattern matcher used to distinguish between actions to be performed
 									Pattern pattern = Pattern.compile(name);
 									Matcher there = pattern.matcher(result);
 									if (!there.find())
 										System.out.println(result.substring(7));
+
+									// User enters the chat (displayed on all other users)
 								} else if (result.startsWith("JOINGROUP")) {
 									System.out.println(result.substring(9) + " has joined the chat\n");
+
+									// User enters the chat (only displayed for the user)
 								} else if (result.equals("GOCHAT!")) {
-									System.out.println("You can start talking now!\n");
+									System.out
+											.println("You can start talking now!\nType 'LOGOUT' at anytime to leave\n");
+
+									// User leaves the chat
 								} else if (result.equals("YOUHAVELOGOUT")) {
-									System.out.println("YOU has left the chat\n");
+									System.out.println("YOU have left the chat\n");
 									break;
 								}
 							} catch (Exception e) {
@@ -98,11 +105,9 @@ public class Client {
 			});
 
 			readMsg.start();
-			// sendMsg.start();
 
 		} catch (IOException ioe) {
 			System.err.println(ioe);
-		} finally {
 		}
 	}// End-of-main
 }// End-ofclass
