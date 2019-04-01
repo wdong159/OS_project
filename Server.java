@@ -11,21 +11,17 @@ import java.io.*;
 import java.util.*;
 
 public class Server {
-	/*
-	 * create two sets that store the usernames and all the messages that user send
-	 * to the server
-	 */
+
+	// Create two sets that store the usernames and all the messages that user send
+	// to the server
 	private static Set<String> allClient = new HashSet<>();
 	private static Set<DataOutputStream> writers = new HashSet<>();
-	// public static boolean moreThenTwo = false;
+	private static HashMap<String, DataOutputStream> users = new HashMap<>();
 
 	public static void main(String[] args) {
 		ServerSocket servSock;
 		Socket sock;
 		try {
-			/*
-			 * each client has its own thread
-			 */
 			servSock = new ServerSocket(7000);
 			System.out.println("Server started at " + new Date() + '\n');
 			while (true) {
@@ -40,7 +36,7 @@ public class Server {
 			System.err.println(ioe);
 		}
 
-	}// End-of-main
+	}
 
 	// Thread class
 	private static class ChatRoom implements Runnable {
@@ -50,22 +46,20 @@ public class Server {
 		DataOutputStream output2client;
 		DataInputStream input4mclient;
 
-		// pass down the client socket and assign it to local socket
+		// Pass down the client socket and assign it to local socket
 		public ChatRoom(Socket socket) {
 			this.socket = socket;
 		}
 
 		public void run() {
 			try {
-				// create data input and data output streams
+				// Create data input and data output streams
 				input4mclient = new DataInputStream(socket.getInputStream());
 				output2client = new DataOutputStream(socket.getOutputStream());
 
-				/*
-				 * Ask for the username and if username already exists ask for another username
-				 */
+				// Ask for the username and if username already exists ask for another username
 				while (true) {
-					output2client.writeUTF("YOURNAME");
+					output2client.writeUTF("Enter your name: ");
 					name = input4mclient.readUTF();
 					if (name == null)
 						return;
@@ -78,17 +72,17 @@ public class Server {
 					}
 				}
 
-				// broadcasts to everyone in the group chat that a new user has entered the chat
+				// Broadcasts to everyone in the group chat that a new user has entered the chat
 				for (DataOutputStream w : writers) {
 					w.writeUTF("JOINGROUP" + name);
 				}
 
-				// stores the new client out put stream so we can boardcast to everyone
+				// Stores the new client output stream so we can boardcast to everyone
 				writers.add(output2client);
 
 				output2client.writeUTF("GOCHAT!");
 
-				// conversation starts here, once someone types LOGOUT he/she is going to sign
+				// Conversation starts here, once someone types LOGOUT he/she is going to sign
 				// out
 				while (true) {
 					String message = input4mclient.readUTF();
@@ -96,20 +90,23 @@ public class Server {
 						output2client.writeUTF("YOUHAVELOGOUT");
 						break;
 					}
+
+					// If the user tags someone, the message will only be sent to that user
+					else if(message.startsWith("@")){
+						String[] temp = message.split(" ", 2);
+						
+					}
 					for (DataOutputStream w : writers) {
 
 						w.writeUTF("Message" + name + ": " + message);
 					}
-				} // end of while sending message
-					// System.out.println("123");
+				}
 
 			} catch (Exception e) {
 				System.out.println(e);
 			} finally {
 
-				/*
-				 * base case when someone leaves the chat removes the client from the list
-				 */
+				// When someone leaves the chat, it removes the client from the list
 				try {
 					System.out.println(name + " has left\n");
 
@@ -123,7 +120,7 @@ public class Server {
 						}
 					}
 
-					// close the socket
+					// Close the socket
 					socket.close();
 
 				} catch (Exception e) {
@@ -132,5 +129,4 @@ public class Server {
 			}
 		}
 	}
-
-}// End-of-class
+}

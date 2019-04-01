@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 
 public class Client {
 	static String name;
-	// static boolean go = false;
 
 	public static void main(String[] args) throws Exception {
 		try {
@@ -64,10 +63,9 @@ public class Client {
 								String result = result4mserver.readUTF();
 
 								// If user joins the chat, asks for a username
-								if (result.startsWith("YOURNAME")) {
+								if (result.startsWith("Enter your name: ")) {
 									System.out.println(result);
 									name = scn.next();
-									name.toUpperCase();
 									data2server.writeUTF(name);
 									sendMsg.start();
 								} else if (result.startsWith("Message")) {
@@ -109,5 +107,5 @@ public class Client {
 		} catch (IOException ioe) {
 			System.err.println(ioe);
 		}
-	}// End-of-main
-}// End-ofclass
+	}
+}
