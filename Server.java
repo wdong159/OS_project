@@ -96,18 +96,16 @@ public class Server {
 					else if (message.startsWith("@")) {
 						String[] temp = message.split(" ", 2);
 						String direct_user = temp[0].substring(1);
-						//System.out.println(direct_user);
 
+						// Checks to see if the target user is valid
 						if (users.containsKey(direct_user)) {
 							users.get(direct_user).writeUTF("Message" + name + "(PM): " + temp[1]);
-							//System.out.println(temp[1]);
+						} else {
+							users.get(name).writeUTF("Message\n** The user you tagged does not exist **\n\n");
 						}
-						else{
-						users.get(name).writeUTF("Message\n** The user you tagged does not exist **\n\n");
-						}
-
 					}
 
+					// For normal messages (sends to all users)
 					else {
 						for (DataOutputStream w : writers) {
 
