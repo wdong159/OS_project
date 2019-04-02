@@ -63,10 +63,14 @@ public class Server {
 					name = input4mclient.readUTF();
 					if (name == null)
 						return;
+
 					// synchronized - adds a new client to the group
+					// Stores the new client output stream so we can boardcast to everyone
 					synchronized (allClient) {
 						if (name != null && !allClient.contains(name)) {
 							allClient.add(name);
+							writers.add(output2client);
+							users.put(name, output2client);
 							break;
 						}
 					}
@@ -76,9 +80,6 @@ public class Server {
 				for (DataOutputStream w : writers) {
 					w.writeUTF("JOINGROUP" + name);
 				}
-
-				// Stores the new client output stream so we can boardcast to everyone
-				writers.add(output2client);
 
 				output2client.writeUTF("GOCHAT!");
 
@@ -92,13 +93,26 @@ public class Server {
 					}
 
 					// If the user tags someone, the message will only be sent to that user
-					else if(message.startsWith("@")){
+					else if (message.startsWith("@")) {
 						String[] temp = message.split(" ", 2);
-						
-					}
-					for (DataOutputStream w : writers) {
+						String direct_user = temp[0].substring(1);
+						//System.out.println(direct_user);
 
-						w.writeUTF("Message" + name + ": " + message);
+						if (users.containsKey(direct_user)) {
+							users.get(direct_user).writeUTF("Message" + name + "(PM): " + temp[1]);
+							//System.out.println(temp[1]);
+						}
+						else{
+						users.get(name).writeUTF("Message\n** The user you tagged does not exist **\n\n");
+						}
+
+					}
+
+					else {
+						for (DataOutputStream w : writers) {
+
+							w.writeUTF("Message" + name + ": " + message);
+						}
 					}
 				}
 
